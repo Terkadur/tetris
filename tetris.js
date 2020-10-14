@@ -8,7 +8,7 @@ var piece;
 var letter_dict;
 grid = [];
 t = 0;
-wait_time = 1;
+wait_time = 1/2;
 score = 0;
 _fr_ = 60;
 tetris_mode = false;
