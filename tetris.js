@@ -730,3 +730,5 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
     real_path.shift();
   }
 }
+
+//test
