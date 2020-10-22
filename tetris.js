@@ -731,4 +731,6 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
   }
 }
 
-//test
+//git status
+//git commit -am ""
+//git push
