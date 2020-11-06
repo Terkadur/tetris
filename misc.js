@@ -7,7 +7,6 @@ function holdPiece() {
       next_show = new Tetromino(next_x, next_y, next_piece);
       held_show = new Tetromino(held_x, held_y, held_piece);
       t = wait_time*_fr_;
-      // t = 0;
     } else {
       let temp_piece = held_piece;
       held_piece = piece.letter;
@@ -44,17 +43,17 @@ function clearRow(rows) {
 }
   
 function youLose() {
+  let next_game = true;
 
   if (ai_active) {
     //records score of subject
     indivs.setNum(subject, "score", score);
+    print(subject, generation, score);
 
     //breaks at end of generation
     if (subject < population - 1) {
       //goes to next subject
       subject++;
-
-      newGame();
     } else {
       //best subject
       let best_score = -1;
@@ -78,10 +77,12 @@ function youLose() {
         if (save_gen) {
           saveTable(indivs, 'gen_data.csv');
         }
+        next_game = false;
         noLoop();
       }
     }
-  } else {
+  }
+  if (next_game) {
     newGame();
   }
 }

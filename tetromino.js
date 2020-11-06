@@ -43,7 +43,6 @@ function Tetromino(x, y, letter, rot = 0) {
     }
     if (move_d) {
       this.y -= 1;
-      // t = 0;
       t = wait_time*_fr_;
     }
     return move_d;

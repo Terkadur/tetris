@@ -124,11 +124,7 @@ function draw() {
     
     //ai scans the board
     if (ai_active) {
-      //newAI
       artIntel(piece.x, piece.y, piece.letter, held_piece, next_piece, piece.rot, grid);
-
-      //oldAI
-      // artIntel(piece.x, piece.y, piece.shape, piece.rot, grid);
     }
     
     if (t % (wait_time*_fr_) == wait_time*_fr_ - 1) {
