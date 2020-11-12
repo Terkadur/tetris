@@ -1,6 +1,6 @@
 function holdPiece() {
   if (!hold_lock) {
-    if (!held_piece) {
+    if (!held_piece) { //switches with next piece if no held piece exists
       held_piece = piece.letter;
       piece = new Tetromino(4, 18, next_piece);
       next_piece = random(["I", "O", "T", "S", "Z", "J", "L"]);
@@ -46,16 +46,14 @@ function youLose() {
   let next_game = true;
 
   if (ai_active) {
-    //records score of subject
     indivs.setNum(subject, "score", score);
-    print(subject, generation, score);
 
     //breaks at end of generation
     if (subject < population - 1) {
       //goes to next subject
       subject++;
     } else {
-      //best subject
+      //find best subject
       let best_score = -1;
       let best_subject = -1;
       for (let i = 0; i < population; i++) {
@@ -65,15 +63,13 @@ function youLose() {
         }
       }
 
-      print("subject: " + best_subject);
-      print("score: " + best_score);
-      print("height coefficient: " + indivs.getNum(best_subject, "height"));
-      print("holes coefficient: " + indivs.getNum(best_subject, "holes"));
-      print("clears coefficient: " + indivs.getNum(best_subject, "clears"));
+      print(generation, best_score, [indivs.getNum(best_subject, "height"), indivs.getNum(best_subject, "holes"), indivs.getNum(best_subject, "clears")]);
+
       if (generation < max_gen - 1) {
         generation++;
         newGen();
       } else {
+        //last generation
         if (save_gen) {
           saveTable(indivs, 'gen_data.csv');
         }
@@ -107,6 +103,7 @@ function newGame() {
   next_show = new Tetromino(next_x, next_y, next_piece);
   held_piece = false;
 
+  //sets new AI coefficients
   if (ai_active) {
     height_coef = indivs.getNum(subject, "height");
     hole_coef = indivs.getNum(subject, "holes");

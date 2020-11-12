@@ -17,7 +17,6 @@ function newGen() {
       newRow.setNum("clears", random(-100, 100));
     }
   } else if (generation > 0 || prev_gen) { //if there is previous generation data, mutate based on that
-    //if there's an error, it may be due to the fact that you assigned indivs to new_indivs and its not a new table
     let new_indivs = new p5.Table();
 
     new_indivs.addColumn("score");
@@ -25,7 +24,7 @@ function newGen() {
     new_indivs.addColumn("holes");
     new_indivs.addColumn("clears");
 
-    //best subject
+    //find best subject
     let best_score = -1;
     let best_subject = -1;
     for (let i = 0; i < population; i++) {
@@ -49,7 +48,6 @@ function newGen() {
 
     //creates new population with randomization
     for (let i = 1; i < population; i++) {
-
       //finds parent
       let rand = random(0, total_score);
       let parent;

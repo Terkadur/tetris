@@ -26,7 +26,7 @@ let subscore = 0;
 const _fr_ = 60;
 let tetris_mode = false;
 let ai_active = true;
-let _cpt_ = 50; //calculations per tick, makes it go faster by moving more times for each frame drawn
+let _cpt_ = 50; //calculations per tick
 let next_piece = false;
 let held_piece = false;
 let next_show, hold_show;
@@ -42,20 +42,23 @@ const mutation_strength = 10;
 
 let prev_gen = false;
 let save_gen = false;
+let show_screen = true;
 
 let height_coef;
 let hole_coef;
 let clear_coef;
 
 function preload() {
-  if (prev_gen) {
+  if (prev_gen) { //loads previous generation data
     indivs = loadTable("gen_data.csv", "csv", "header");
   }
 }
 
 //setup is called once when the code is first executed
 function setup() {
-  createCanvas(board_width*scl + scl*x_gap, board_height*scl + scl*y_gap);
+  if (show_screen) {
+    createCanvas(board_width*scl + scl*x_gap, board_height*scl + scl*y_gap);
+  }
   frameRate(_fr_);
 
   if (ai_active) {
@@ -93,7 +96,7 @@ function setup() {
 //draw is called continuously after setup
 function draw() {
   for (let c = 0; c < _cpt_; c++) {
-    //clear full rows
+    //find and clear full rows
     let rows_cleared = [];
     for (let j = 0; j < board_height; j++) {
       let full_row = true;
@@ -182,52 +185,54 @@ function draw() {
     t++;
   }
 
-  background(96);
+  if (show_screen) {
+    background(96);
 
-  //draw the board
-  for (let i = 0; i < board_width; i++) {
-    for (let j = 0; j < board_height; j++) {
-      fill(grid[i][j]);
-      rect(scl*i + scl*x_gap/2, height - scl*(j + 1) - scl*y_gap/2, scl, scl);
+    //draw the board
+    for (let i = 0; i < board_width; i++) {
+      for (let j = 0; j < board_height; j++) {
+        fill(grid[i][j]);
+        rect(scl*i + scl*x_gap/2, height - scl*(j + 1) - scl*y_gap/2, scl, scl);
+      }
     }
-  }
 
-  //draw the piece
-  piece.show();
+    //draw the piece
+    piece.show();
 
-  //draw hold area
-  fill(base_color);
-  textSize(scl);
-  textAlign(CENTER, BOTTOM)
-  text("HOLD", scl*x_gap/4, scl*y_gap/2);
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 2; j++) {
-      rect(scl*i + (scl*x_gap/2 - scl*4)/2, scl*j + scl*y_gap/2, scl, scl);
+    //draw hold area
+    fill(base_color);
+    textSize(scl);
+    textAlign(CENTER, BOTTOM)
+    text("HOLD", scl*x_gap/4, scl*y_gap/2);
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 2; j++) {
+        rect(scl*i + (scl*x_gap/2 - scl*4)/2, scl*j + scl*y_gap/2, scl, scl);
+      }
     }
-  }
-  if (held_piece != false) {
-    held_show.show();
-  }
-
-  //draw next area
-  fill(base_color);
-  textSize(scl);
-  textAlign(CENTER, BOTTOM)
-  text("NEXT", width - scl*x_gap/4, scl*y_gap/2);
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 2; j++) {
-      rect(scl*i + width - scl*x_gap/2 + (scl*x_gap/2 - scl*4)/2, scl*j + scl*y_gap/2, scl, scl);
+    if (held_piece != false) {
+      held_show.show();
     }
-  }
-  next_show.show();
 
-  //draw score
-  fill(base_color);
-  textSize(scl);
-  textAlign(CENTER, BOTTOM)
-  if (ai_active) {
-    text("GENERATION: " + generation, width/2, height - scl*y_gap/4);
-    text("SUBJECT: " + subject, width/2, height - scl*y_gap/16);
+    //draw next area
+    fill(base_color);
+    textSize(scl);
+    textAlign(CENTER, BOTTOM)
+    text("NEXT", width - scl*x_gap/4, scl*y_gap/2);
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 2; j++) {
+        rect(scl*i + width - scl*x_gap/2 + (scl*x_gap/2 - scl*4)/2, scl*j + scl*y_gap/2, scl, scl);
+      }
+    }
+    next_show.show();
+
+    //draw score, generation, and subject
+    fill(base_color);
+    textSize(scl);
+    textAlign(CENTER, BOTTOM)
+    if (ai_active) {
+      text("GENERATION: " + generation, width/2, height - scl*y_gap/4);
+      text("SUBJECT: " + subject, width/2, height - scl*y_gap/16);
+    }
+    text("SCORE: " + score, width/2, scl*y_gap/2);
   }
-  text("SCORE: " + score, width/2, scl*y_gap/2);
 }

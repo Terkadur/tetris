@@ -6,7 +6,7 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
   //minimum cost is set arbitrarily high
   let cost_min = 1000000;
 
-  //create list in order to look at both the current piece and the held piece (next piece if no held piece exists)
+  //create list to look at current piece and the held piece (next piece if no held piece exists)
   let letters = [letter_c];
   if (letter_h == false) {
     letters.push(letter_n);
@@ -14,9 +14,8 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
     letters.push(letter_h);
   }
 
-  //only find best location and its path at the start of each round
+  //find best location path at the start of each round
   if (t == 1) {
-    //empties the real path
     real_path = [];
 
     //scans possible locations
@@ -28,12 +27,11 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
         for (let rot_pos = 0; rot_pos < 4; rot_pos++) {
           //iterates between current and held piece
           for (let l = 0; l < letters.length; l++) {
-            //creates a test piece at the possible position
             let test_piece = new Tetromino(x_pos, y_pos, letters[l], rot_pos);
             let viable = true;
             let resting = false;
 
-            //iterates through cells in the piece to make sure the possible location actually works
+            //check the piece is resting and not colliding
             for (let cell = 0; cell < test_piece.shape.length; cell++) {    
               //horizontal boundaries check
               if (test_piece.shape[cell][0] + x_pos < 0 || test_piece.shape[cell][0] + x_pos > board.length - 1) {
@@ -86,15 +84,12 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
                 if (test_piece.shape[j][1] + y_pos - check_y >= 0) {
                   //check if the chosen cell is empty
                   if (board[test_piece.shape[j][0] + x_pos][test_piece.shape[j][1] + y_pos - check_y] == String(color(base_color))) {
-                    //if the board is empty there, make sure that the chosen cell isn't occupied by the piece itself
+                    //make sure that the chosen cell isn't occupied by the piece itself
                     let over_cell = false;
-                    //iterates through cells in the piece
                     for (let k = 0; k < test_piece.shape.length; k++) {
-                      //skip if it is the same cell in the piece
                       if (k == j) {
                         continue;
                       } else if (test_piece.shape[j][0] == test_piece.shape[k][0] && test_piece.shape[j][1] - check_y == test_piece.shape[k][1]) {
-                        //turns out that the chosen cell is occupied by the piece itself
                         over_cell = true;
                         break;
                       }
@@ -140,13 +135,11 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
             //calculate the score of the possible piece
             let cost_test = height_coef*y_max*y_max + hole_coef*empty_test + clear_coef*clear_test;
             if (cost_test < cost_min) {
-              //NEW BASIC ALGORITHM TO FIND POSSIBLE PATHS
-              //COULD BE IMPROVED UPON (FOR EXAMPLE ROTATING AS LAST MOVE)
               let possible_path = true;
               let test_path = [];
               let iter = 0;
 
-              //iterates until the test piece is 1 below the current piece (to allow AI to rotate "I" piece)
+              //loops until the test piece is 1 below the current piece (to allow AI to rotate "I" piece)
               while (test_piece.y < y - 1) {
                 iter++;
 

@@ -34,6 +34,7 @@ function Tetromino(x, y, letter, rot = 0) {
   //piece movements
   this.moveD = function() {
     let move_d = true;
+    //verify it's a possible move
     for (let j = 0; j < this.shape.length; j++) {  
       if (this.shape[j][1] + this.y == 0) {
         move_d = false;
@@ -43,7 +44,7 @@ function Tetromino(x, y, letter, rot = 0) {
     }
     if (move_d) {
       this.y -= 1;
-      t = wait_time*_fr_;
+      t = wait_time*_fr_; //resets timer
     }
     return move_d;
   };
@@ -92,7 +93,7 @@ function Tetromino(x, y, letter, rot = 0) {
   this.turnR = function() {
     let turn_r = true;
     let save_shape = [];
-    for (let i = 0; i < this.shape.length; i++) {
+    for (let i = 0; i < this.shape.length; i++) { //backup shape in case of impossible move
       save_shape[i] = [...this.shape[i]];
     }
     
@@ -116,8 +117,8 @@ function Tetromino(x, y, letter, rot = 0) {
     }
     
     if (!turn_r) {
-      for (let i = 0; i < save_shape.length; i++) {
-        this.shape[i] = [...save_shape[i]];
+      for (let i = 0; i < save_shape.length; i++) { //returns shape to previous
+        this.shape[i] = [...save_shape[i]]; 
       }
     } else {
       this.rot = (this.rot + 1) % 4;
