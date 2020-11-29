@@ -16,6 +16,7 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
 
   //find best location path at the start of each round
   if (t == 1) {
+    let final_val;
     real_path = [];
 
     //scans possible locations
@@ -131,9 +132,146 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
                 clear_test++;
               }
             }
+
+            //how many empty pillars
+            let x_min = 100;
+            let x_max = -100;
+            //finds columns to check
+            for (let j = 0; j < test_piece.shape.length; j++) {
+              if (test_piece.shape[j][0] + x_pos < x_min) {
+                x_min = test_piece.shape[j][0] + x_pos;
+              }
+              if (test_piece.shape[j][0] + x_pos > x_max) {
+                x_max = test_piece.shape[j][0] + x_pos;
+              }
+            }
+            x_min -= 1;
+            x_max += 1;
+            let pillar_test = 0;
+            if (x_min >= 0) {
+              let pillar_height = 0;
+              for (let y_test = 0; y_test <= y_max; y_test++) {
+                //if chosen cell is empty
+                if (String(board[x_min][y_test]) == String(color(base_color))) {
+                  //check adjacent sides
+                  //check left side
+                  let left_surrounded = true;
+                  if (x_min > 0) {
+                    //if not surrounded by board
+                    if (String(board[x_min - 1][y_test]) == String(color(base_color))) {
+                      left_surrounded = false;
+                    }
+                  }
+                  //check right side
+                  let right_surrounded = true;
+                  if (x_min < 9) {
+                    if (String(board[x_min + 1][y_test]) == String(color(base_color))) {
+                      right_surrounded = false;
+                      for (let j = 0; j < test_piece.shape.length; j++) {
+                        if (x_min + 1 == x_pos + test_piece.shape[j][0] && y_test == y_pos + test_piece.shape[j][1]) {
+                          right_surrounded = true;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  if (left_surrounded && right_surrounded) {
+                    pillar_height += 1;
+                  }
+                }
+              }
+              if (pillar_height > 2) {
+                pillar_test += pillar_height;
+              }
+            }
+            if (x_max <= 9) {
+              let pillar_height = 0;
+              for (let y_test = 0; y_test <= y_max; y_test++) {
+                //if chosen cell is empty
+                if (String(board[x_max][y_test]) == String(color(base_color))) {
+                  //check adjacent sides
+                  //check left side
+                  let left_surrounded = true;
+                  if (x_max > 0) {
+                    //if not surrounded by board
+                    if (String(board[x_max - 1][y_test]) == String(color(base_color))) {
+                      left_surrounded = false;
+                      for (let j = 0; j < test_piece.shape.length; j++) {
+                        if (x_max - 1 == x_pos + test_piece.shape[j][0] && y_test == y_pos + test_piece.shape[j][1]) {
+                          left_surrounded = true;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  //check right side
+                  let right_surrounded = true;
+                  if (x_max < 9) {
+                    if (String(board[x_max + 1][y_test]) == String(color(base_color))) {
+                      right_surrounded = false;
+                    }
+                  }
+
+                  if (left_surrounded && right_surrounded) {
+                    pillar_height += 1;
+                  }
+                }
+              }
+              if (pillar_height > 2) {
+                pillar_test += pillar_height;
+              }
+            }
+
+
+            //calculate bumpiness
+            let bumps_test = 0;
+            for (let i = 0; i < board_width - 1; i++) {
+              let highest_1 = board_height - 1;
+              while (String(board[i][highest_1]) == String(color(base_color))) {
+                let search_next = true;
+                for (let j = 0; j < test_piece.shape.length; j++) {
+                  if (test_piece.shape[j][0] + x_pos == i && test_piece.shape[j][1] + y_pos == highest_1) {
+                    search_next = false;
+                    break;
+                  }
+                }
+                if (search_next) {
+                  highest_1 -= 1;
+                  if (highest_1 <= -1) {
+                    break;
+                  }
+                } else {
+                  break;
+                }
+              }
+              let highest_2 = board_height - 1;
+              while (String(board[i + 1][highest_2]) == String(color(base_color))) {
+                let search_next = true;
+                for (let j = 0; j < test_piece.shape.length; j++) {
+                  if (test_piece.shape[j][0] + x_pos == i + 1 && test_piece.shape[j][1] + y_pos == highest_2) {
+                    search_next = false;
+                    break;
+                  }
+                }
+                if (search_next) {
+                  highest_2 -= 1;
+                  if (highest_2 <= -1) {
+                    break;
+                  }
+                } else {
+                  break;
+                }
+              }
+              bumps_test += abs(highest_1 - highest_2);
+            }
+
             
             //calculate the score of the possible piece
-            let cost_test = height_coef*y_max*y_max + hole_coef*empty_test + clear_coef*clear_test;
+            let cost_test = height_coef*y_max*y_max;
+            cost_test += hole_coef*empty_test;
+            cost_test += clear_coef*clear_test;
+            cost_test += pillar_coef*pillar_test;
+            cost_test += bump_coef*bumps_test;
             if (cost_test < cost_min) {
               let possible_path = true;
               let test_path = [];
@@ -147,15 +285,26 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
                 //of moves is saved backwards in the list of moves
 
                 //if the test piece can move up, move it up and add to the path
+                let try_turning = true;
                 if (test_piece.moveU()) {
                   test_path.unshift("mD");
+                  try_turning = false;
                 } else if (test_piece.x < x) { //if the piece can't move up, move the piece horizontally towards the current piece
                   if (test_piece.moveR()) {
                     test_path.unshift("mL");
+                    try_turning = false;
                   } 
                 } else if (test_piece.x > x) {
                   if (test_piece.moveL()) {
                     test_path.unshift("mR");
+                    try_turning = false;
+                  }
+                }
+                if (try_turning) {
+                  if (test_piece.turnR()) {
+                    test_path.unshift("tL");
+                  } else if (test_piece.turnL()) {
+                    test_path.unshift("tR");
                   }
                 }
 
@@ -221,12 +370,16 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
                 //readjust the cost and set the real path to the possible path
                 cost_min = cost_test;
                 real_path = test_path;
+                final_val = pillar_test;
+
+                //y_max, empty_test, clear_test, pillar_test, bumps_test
               }
             }
           }
         }
       }
     }
+    // print(final_val);
   }
 
   target_down = false;

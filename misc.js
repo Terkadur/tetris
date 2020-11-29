@@ -45,8 +45,17 @@ function clearRow(rows) {
 function youLose() {
   let next_game = true;
 
-  if (ai_active) {
+  if (ai_active && natural_selection) {
     indivs.setNum(subject, "score", score);
+
+    let print_data = [String(generation) + ":" + String(subject)];
+    print_data.push(score);
+    print_data.push(height_coef);
+    print_data.push(hole_coef);
+    print_data.push(clear_coef);
+    print_data.push(pillar_coef);
+    print_data.push(bump_coef);
+    print(print_data);
 
     //breaks at end of generation
     if (subject < population - 1) {
@@ -63,7 +72,8 @@ function youLose() {
         }
       }
 
-      print(generation, best_score, [indivs.getNum(best_subject, "height"), indivs.getNum(best_subject, "holes"), indivs.getNum(best_subject, "clears")]);
+      print("BEST SUBJECT: " + best_subject);
+      print("BEST SCORE: " + best_score);
 
       if (generation < max_gen - 1) {
         generation++;
@@ -74,6 +84,12 @@ function youLose() {
           saveTable(indivs, 'gen_data.csv');
         }
         next_game = false;
+        //DANGER
+        generation++;
+        newGen();
+        //DANGER
+        print("--- BEST DATA ---");
+        print(best_data);
         noLoop();
       }
     }
@@ -104,9 +120,11 @@ function newGame() {
   held_piece = false;
 
   //sets new AI coefficients
-  if (ai_active) {
+  if (ai_active && natural_selection) {
     height_coef = indivs.getNum(subject, "height");
     hole_coef = indivs.getNum(subject, "holes");
     clear_coef = indivs.getNum(subject, "clears");
+    pillar_coef = indivs.getNum(subject, "pillars");
+    bump_coef = indivs.getNum(subject, "bumps");
   }
 }

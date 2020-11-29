@@ -6,7 +6,8 @@ function newGen() {
     indivs.addColumn("height");
     indivs.addColumn("holes");
     indivs.addColumn("clears");
-
+    indivs.addColumn("pillars");
+    indivs.addColumn("bumps");
 
     for (let i = 0; i < population; i++) {
       let newRow = indivs.addRow();
@@ -15,6 +16,8 @@ function newGen() {
       newRow.setNum("height", random(-100, 100));
       newRow.setNum("holes", random(-100, 100));
       newRow.setNum("clears", random(-100, 100));
+      newRow.setNum("pillars", random(-100, 100));
+      newRow.setNum("bumps", random(-100, 100));
     }
   } else if (generation > 0 || prev_gen) { //if there is previous generation data, mutate based on that
     let new_indivs = new p5.Table();
@@ -23,6 +26,9 @@ function newGen() {
     new_indivs.addColumn("height");
     new_indivs.addColumn("holes");
     new_indivs.addColumn("clears");
+    new_indivs.addColumn("pillars");
+    new_indivs.addColumn("bumps");
+    
 
     //find best subject
     let best_score = -1;
@@ -39,6 +45,18 @@ function newGen() {
     immortal_subject.setNum("height", indivs.getNum(best_subject, "height"));
     immortal_subject.setNum("holes", indivs.getNum(best_subject, "holes"));
     immortal_subject.setNum("clears", indivs.getNum(best_subject, "clears"));
+    immortal_subject.setNum("pillars", indivs.getNum(best_subject, "pillars"));
+    immortal_subject.setNum("bumps", indivs.getNum(best_subject, "bumps"));
+
+    if (best_score > best_data[1]) {
+      best_data = [String(generation - 1) + ":" + String(best_subject)];
+      best_data.push(best_score);
+      best_data.push(indivs.getNum(best_subject, "height"));
+      best_data.push(indivs.getNum(best_subject, "holes"));
+      best_data.push(indivs.getNum(best_subject, "clears"));
+      best_data.push(indivs.getNum(best_subject, "pillars"));
+      best_data.push(indivs.getNum(best_subject, "bumps"));
+    }
 
     //calculates total score
     let total_score = 0;
@@ -65,18 +83,25 @@ function newGen() {
       newRow.setNum("height", indivs.getNum(parent, "height"));
       newRow.setNum("holes", indivs.getNum(parent, "holes"));
       newRow.setNum("clears", indivs.getNum(parent, "clears"));
+      newRow.setNum("pillars", indivs.getNum(parent, "pillars"));
+      newRow.setNum("bumps", indivs.getNum(parent, "bumps"));
 
       //mutates new generation (should it be multiplied or added?)
       let mut_height = newRow.getNum("height") + random(-mutation_strength, mutation_strength);
       let mut_holes = newRow.getNum("holes") + random(-mutation_strength, mutation_strength);
       let mut_clears = newRow.getNum("clears") + random(-mutation_strength, mutation_strength);
+      let mut_pillars = newRow.getNum("pillars") + random(-mutation_strength, mutation_strength);
+      let mut_bumps = newRow.getNum("bumps") + random(-mutation_strength, mutation_strength);
 
       newRow.setNum("height", mut_height);
       newRow.setNum("holes", mut_holes);
       newRow.setNum("clears", mut_clears);
+      newRow.setNum("pillars", mut_pillars);
+      newRow.setNum("bumps", mut_bumps);
     }
 
     indivs = new_indivs;
     subject = 0;
+    mutation_strength *= 0.95;
   }
 }

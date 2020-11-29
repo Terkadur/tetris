@@ -1,13 +1,15 @@
-/*BEST AI:
-score: 173700
-height coefficient: 3.2411994054403293
-holes coefficient: 3.9251021596321447
-clears coefficient: -97.84801223369767
+//best score: 10891400
+//best observed coefficients
+let height_coef = 0.3247043909948495;
+let hole_coef = 89.61566373784466;
+let clear_coef = -44.175221221106014;
+let pillar_coef = 80.49967061357985;
+let bump_coef = 18.532194107310588;
 
+/*how to update files with git
 git status
 git commit -am ""
 git push
-
 */
 
 const board_width = 10;
@@ -26,31 +28,62 @@ let subscore = 0;
 const _fr_ = 60;
 let tetris_mode = false;
 let ai_active = true;
-let _cpt_ = 50; //calculations per tick
+let _cpt_ = 500; //calculations per tick
 let next_piece = false;
 let held_piece = false;
 let next_show, hold_show;
 let hold_lock = false;
 let next_x, next_y, held_x, held_y;
 
-const population = 16;
+const population = 64;
 let indivs;
 let subject = 0;
 let generation = 0;
-const max_gen = 8;
-const mutation_strength = 10;
+const max_gen = 128;
+let mutation_strength = 10;
 
-let prev_gen = false;
+let prev_gen = true;
 let save_gen = false;
-let show_screen = true;
+let show_screen = false;
+let natural_selection = true;
 
-let height_coef;
-let hole_coef;
-let clear_coef;
+let best_data = [0, -1];
+
+/*
+blocks in rightmost lane
+clearing less than 4 lines
+tetris slam
+
+ledges
+burrying holes
+
+next piece
+*/
 
 function preload() {
   if (prev_gen) { //loads previous generation data
-    indivs = loadTable("gen_data.csv", "csv", "header");
+    // indivs = loadTable("gen_data.csv", "csv", "header");
+
+    indivs = new p5.Table();
+
+    indivs.addColumn("score");
+    indivs.addColumn("height");
+    indivs.addColumn("holes");
+    indivs.addColumn("clears");
+    indivs.addColumn("pillars");
+    indivs.addColumn("bumps");
+
+    for (let i = 0; i < population; i++) {
+      let newRow = indivs.addRow();
+
+      //creates random coefficients for each subject
+      newRow.setNum("score", 100);
+      newRow.setNum("height", height_coef);
+      newRow.setNum("holes", hole_coef);
+      newRow.setNum("clears", clear_coef);
+      newRow.setNum("pillars", pillar_coef);
+      newRow.setNum("bumps", bump_coef);
+    }
   }
 }
 
@@ -61,7 +94,7 @@ function setup() {
   }
   frameRate(_fr_);
 
-  if (ai_active) {
+  if (ai_active && natural_selection) {
     newGen();
   }
 
@@ -109,7 +142,6 @@ function draw() {
       if (full_row) {
         rows_cleared.push(j);
         score += 100;
-        subscore += 1;
       }
     }
     clearRow(rows_cleared);
