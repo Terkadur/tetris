@@ -55,17 +55,19 @@ function youLose() {
     print_data.push(clear_coef);
     print_data.push(pillar_coef);
     print_data.push(bump_coef);
+    print_data.push(ledge_coef);
+    print_data.push(bury_coef);
     print(print_data);
 
     //breaks at end of generation
-    if (subject < population - 1) {
+    if (subject < current_pop - 1) {
       //goes to next subject
       subject++;
     } else {
       //find best subject
       let best_score = -1;
       let best_subject = -1;
-      for (let i = 0; i < population; i++) {
+      for (let i = 0; i < current_pop; i++) {
         if (indivs.getNum(i, "score") > best_score) {
           best_score = indivs.getNum(i, "score");
           best_subject = i;
@@ -126,5 +128,7 @@ function newGame() {
     clear_coef = indivs.getNum(subject, "clears");
     pillar_coef = indivs.getNum(subject, "pillars");
     bump_coef = indivs.getNum(subject, "bumps");
+    ledge_coef = indivs.getNum(subject, "ledges");
+    bury_coef = indivs.getNum(subject, "buries");
   }
 }
