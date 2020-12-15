@@ -68,10 +68,6 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
             //scores possible locations
             let y_max = 0;
             let empty_test = 0;
-
-            let holes_test = 0;
-            let ledge_test = 0;
-            let bury_test = 0;
             
             //iterates through cells in the piece
             for (let j = 0; j < test_piece.shape.length; j++) {
@@ -79,119 +75,35 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
               if (y_pos + test_piece.shape[j][1] > y_max) {
                 y_max = y_pos + test_piece.shape[j][1];
               }
-
-              let check_y = 1;
-              let burried = false;
-              let ledge = false;
-              //loop ensures not going through the floor
-              while (test_piece.shape[j][1] + y_pos - check_y >= 0) {
-                //is space below occupied by board
-                if (board[test_piece.shape[j][0] + x_pos][test_piece.shape[j][1] + y_pos - check_y] == String(color(base_color))) {
-                  //is space below occupied by piece
-                  let over_self = false;
-                  for (let k = 0; k < test_piece.shape.length; k++) {
-                    if (k == j) {
-                      continue;
-                    } else if (test_piece.shape[j][0] == test_piece.shape[k][0] && test_piece.shape[j][1] - check_y == test_piece.shape[k][1]) {
-                      over_self = true;
-                      break;
-                    }
-                  }
-                  if (over_self) {
-                    break;
-                  }
-
-                  //--------------------------------------------------
-                  //test if ledge (right)
-                  if (test_piece.shape[j][0] + x_pos + 1 <= 9 && check_y == 1) {
-                    //is space to right empty
-                    let right_empty = false;
-                    if (board[test_piece.shape[j][0] + x_pos + 1][test_piece.shape[j][1] + y_pos - check_y] == String(color(base_color))) {
-                      let occupied_self = false;
-                      for (let k = 0; k < test_piece.shape.length; k++) {
-                        if (k == j) {
-                          continue;
-                        } else if (test_piece.shape[j][0] + 1 == test_piece.shape[k][0] && test_piece.shape[j][1] - check_y == test_piece.shape[k][1]) {
-                          occupied_self = true;
-                          break;
-                        }
-                      }
-                      if (!occupied_self) {
-                        right_empty = true;
+              
+              //counts the holes created by the possible piece
+              let check_below = true;
+              let check_y = 1; //how far down to check for holes
+              while (check_below) {
+                check_below = false;
+                //don't look for holes lower than the floor
+                if (test_piece.shape[j][1] + y_pos - check_y >= 0) {
+                  //check if the chosen cell is empty
+                  if (board[test_piece.shape[j][0] + x_pos][test_piece.shape[j][1] + y_pos - check_y] == String(color(base_color))) {
+                    //make sure that the chosen cell isn't occupied by the piece itself
+                    let over_cell = false;
+                    for (let k = 0; k < test_piece.shape.length; k++) {
+                      if (k == j) {
+                        continue;
+                      } else if (test_piece.shape[j][0] == test_piece.shape[k][0] && test_piece.shape[j][1] - check_y == test_piece.shape[k][1]) {
+                        over_cell = true;
+                        break;
                       }
                     }
-                    
-                    //is space to up right empty
-                    if (right_empty) {
-                      if (board[test_piece.shape[j][0] + x_pos + 1][test_piece.shape[j][1] + y_pos] == String(color(base_color))) {
-                        let occupied_self = false;
-                        for (let k = 0; k < test_piece.shape.length; k++) {
-                          if (k == j) {
-                            continue;
-                          } else if (test_piece.shape[j][0] + 1 == test_piece.shape[k][0] && test_piece.shape[j][1] == test_piece.shape[k][1]) {
-                            occupied_self = true;
-                            break;
-                          }
-                        }
-                        if (!occupied_self) {
-                          ledge = true;
-                        }
-                      }
+                    if (!over_cell) {
+                      //adds to the number of holes created by the piece, keeps checking below
+                      empty_test++;
+                      check_below = true;
+                      check_y += 1;
                     }
                   }
-
-                  //test if ledge (left)
-                  if (!ledge && test_piece.shape[j][0] + x_pos - 1 >= 0 && check_y == 1) {
-                    //is space to right empty
-                    let left_empty = false;
-                    if (board[test_piece.shape[j][0] + x_pos - 1][test_piece.shape[j][1] + y_pos - check_y] == String(color(base_color))) {
-                      let occupied_self = false;
-                      for (let k = 0; k < test_piece.shape.length; k++) {
-                        if (k == j) {
-                          continue;
-                        } else if (test_piece.shape[j][0] - 1 == test_piece.shape[k][0] && test_piece.shape[j][1] - check_y == test_piece.shape[k][1]) {
-                          occupied_self = true;
-                          break;
-                        }
-                      }
-                      if (!occupied_self) {
-                        left_empty = true;
-                      }
-                    }
-                    
-                    //is space to up left empty
-                    if (left_empty) {
-                      if (board[test_piece.shape[j][0] + x_pos - 1][test_piece.shape[j][1] + y_pos] == String(color(base_color))) {
-                        let occupied_self = false;
-                        for (let k = 0; k < test_piece.shape.length; k++) {
-                          if (k == j) {
-                            continue;
-                          } else if (test_piece.shape[j][0] - 1 == test_piece.shape[k][0] && test_piece.shape[j][1] == test_piece.shape[k][1]) {
-                            occupied_self = true;
-                            break;
-                          }
-                        }
-                        if (!occupied_self) {
-                          ledge = true;
-                        }
-                      }
-                    }
-                  }
-                  //-----------------------------------------------
-
-                  if (!ledge && !burried) {
-                    holes_test++;
-                  } else if (ledge && !burried) {
-                    ledge_test++;
-                  } else if (burried) {
-                    bury_test++;
-                  }
-                } else {
-                  burried = true;
                 }
-                check_y++;
               }
-
             }
             
             //how many lines does the new piece clear
@@ -356,13 +268,10 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
             
             //calculate the score of the possible piece
             let cost_test = height_coef*y_max*y_max;
-            cost_test += hole_coef*holes_test;
+            cost_test += hole_coef*empty_test;
             cost_test += clear_coef*clear_test;
             cost_test += pillar_coef*pillar_test;
             cost_test += bump_coef*bumps_test;
-            cost_test += ledge_coef*ledge_test;
-            cost_test += bury_coef*bury_test;
-
             if (cost_test < cost_min) {
               let possible_path = true;
               let test_path = [];
@@ -461,9 +370,9 @@ function artIntel(x, y, letter_c, letter_h, letter_n, rot, board) {
                 //readjust the cost and set the real path to the possible path
                 cost_min = cost_test;
                 real_path = test_path;
-                final_val = [holes_test, ledge_test, bury_test];
+                final_val = pillar_test;
 
-                //y_max, holes_test, clear_test, pillar_test, bumps_test, ledge_test, bury_test
+                //y_max, empty_test, clear_test, pillar_test, bumps_test
               }
             }
           }

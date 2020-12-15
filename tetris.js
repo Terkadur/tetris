@@ -1,12 +1,10 @@
-//best score: 36849900
+//best score: 10891400
 //best observed coefficients
-let height_coef = 0.43570807022242075;
-let hole_coef = 82.05378849471467;
-let clear_coef = -58.0380722700375;
-let pillar_coef = 43.21766139788567;
-let bump_coef = 12.927637033962396;
-let ledge_coef = 95.97913157897403;
-let bury_coef = -0.5795635795632053;
+let height_coef = 0.3247043909948495;
+let hole_coef = 89.61566373784466;
+let clear_coef = -44.175221221106014;
+let pillar_coef = 80.49967061357985;
+let bump_coef = 18.532194107310588;
 
 /*how to update files with git
 git status
@@ -29,26 +27,25 @@ let score = 0;
 let subscore = 0;
 const _fr_ = 60;
 let tetris_mode = false;
-let _cpt_ = 50; //calculations per tick
+let ai_active = true;
+let _cpt_ = 500; //calculations per tick
 let next_piece = false;
 let held_piece = false;
 let next_show, hold_show;
 let hold_lock = false;
 let next_x, next_y, held_x, held_y;
 
-let current_pop = 2048;
-let next_pop = 128;
+const population = 64;
 let indivs;
 let subject = 0;
 let generation = 0;
-const max_gen = 64;
-let mutation_strength = 5;
+const max_gen = 128;
+let mutation_strength = 10;
 
-let ai_active = true;
-let prev_gen = false;
+let prev_gen = true;
 let save_gen = false;
-let show_screen = true;
-let natural_selection = false;
+let show_screen = false;
+let natural_selection = true;
 
 let best_data = [0, -1];
 
@@ -75,10 +72,8 @@ function preload() {
     indivs.addColumn("clears");
     indivs.addColumn("pillars");
     indivs.addColumn("bumps");
-    indivs.addColumn("ledges");
-    indivs.addColumn("buries");
 
-    for (let i = 0; i < current_pop; i++) {
+    for (let i = 0; i < population; i++) {
       let newRow = indivs.addRow();
 
       //creates random coefficients for each subject
@@ -88,8 +83,6 @@ function preload() {
       newRow.setNum("clears", clear_coef);
       newRow.setNum("pillars", pillar_coef);
       newRow.setNum("bumps", bump_coef);
-      newRow.setNum("ledges", ledge_coef);
-      newRow.setNum("buries", bury_coef);
     }
   }
 }
