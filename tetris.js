@@ -16,7 +16,7 @@ git push
 
 const board_width = 10;
 const board_height = 20;
-const scl = 16;
+const scl = 20;
 const y_gap = 7;
 const x_gap = 10;
 const base_color = 16;
@@ -29,39 +29,32 @@ let score = 0;
 let subscore = 0;
 const _fr_ = 60;
 let tetris_mode = false;
-let _cpt_ = 50; //calculations per tick
+let _cpt_ = 1; //calculations per tick
 let next_piece = false;
 let held_piece = false;
 let next_show, hold_show;
 let hold_lock = false;
 let next_x, next_y, held_x, held_y;
 
-let current_pop = 2048;
+let current_pop = 128;
 let next_pop = 128;
 let indivs;
 let subject = 0;
 let generation = 0;
-const max_gen = 64;
+const max_gen = 1000;
 let mutation_strength = 5;
 
-let ai_active = true;
+let ai_active = false;
 let prev_gen = false;
 let save_gen = false;
 let show_screen = true;
 let natural_selection = false;
 
 let best_data = [0, -1];
+let buttons = [];
+let sloiders = [];
 
-/*
-blocks in rightmost lane
-clearing less than 4 lines
-tetris slam
 
-ledges
-burrying holes
-
-next piece
-*/
 
 function preload() {
   if (prev_gen) { //loads previous generation data
@@ -97,7 +90,7 @@ function preload() {
 //setup is called once when the code is first executed
 function setup() {
   if (show_screen) {
-    createCanvas(board_width*scl + scl*x_gap, board_height*scl + scl*y_gap);
+    createCanvas(board_width*scl + scl*x_gap + 128, board_height*scl + scl*y_gap);
   }
   frameRate(_fr_);
 
@@ -106,7 +99,7 @@ function setup() {
   }
 
   //position for "next" piece
-  next_x = scl + width - scl*x_gap/2 + (scl*x_gap/2 - scl*4)/2;
+  next_x = scl + (board_width*scl + scl*x_gap) - scl*x_gap/2 + (scl*x_gap/2 - scl*4)/2;
   next_y = scl*y_gap/2;
   next_x = (next_x - scl*x_gap/2)/scl;
   next_y = (height - next_y - scl*y_gap/2)/scl;
@@ -129,6 +122,11 @@ function setup() {
     "J": [color("blue"),   [[0, 0], [-1, 0], [-1, 1], [1, 0]]], 
     "L": [color("orange"), [[0, 0], [-1, 0], [1, 0],  [1, 1]]]
   };
+
+  buttons[0] = new Button(width - 112, y_gap*scl/2 + 64, 96, 32, "AI OFF", "AI ON");
+  buttons[1] = new Button(width - 112, y_gap*scl/2, 96, 32, "NEW GAME", "NEW GAME");
+
+  sloiders[0] = new Sloider(width - 112, y_gap*scl/2 + 152, 96, 1);
   
   newGame();
 }
@@ -256,10 +254,10 @@ function draw() {
     fill(base_color);
     textSize(scl);
     textAlign(CENTER, BOTTOM)
-    text("NEXT", width - scl*x_gap/4, scl*y_gap/2);
+    text("NEXT", (board_width*scl + scl*x_gap) - scl*x_gap/4, scl*y_gap/2);
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 2; j++) {
-        rect(scl*i + width - scl*x_gap/2 + (scl*x_gap/2 - scl*4)/2, scl*j + scl*y_gap/2, scl, scl);
+        rect(scl*i + (board_width*scl + scl*x_gap) - scl*x_gap/2 + (scl*x_gap/2 - scl*4)/2, scl*j + scl*y_gap/2, scl, scl);
       }
     }
     next_show.show();
@@ -268,10 +266,34 @@ function draw() {
     fill(base_color);
     textSize(scl);
     textAlign(CENTER, BOTTOM)
-    if (ai_active) {
-      text("GENERATION: " + generation, width/2, height - scl*y_gap/4);
-      text("SUBJECT: " + subject, width/2, height - scl*y_gap/16);
+    if (ai_active && natural_selection) {
+      text("GENERATION: " + generation, (board_width*scl + scl*x_gap)/2, height - scl*y_gap/4);
+      text("SUBJECT: " + subject, (board_width*scl + scl*x_gap)/2, height - scl*y_gap/16);
     }
-    text("SCORE: " + score, width/2, scl*y_gap/2);
+    text("SCORE: " + score, (board_width*scl + scl*x_gap)/2, scl*y_gap/2);
   }
+  
+  
+
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].show();
+  }
+
+  textAlign(LEFT, TOP);
+  text("SPEED: " + _cpt_, width - 112, y_gap*scl/2 + 112);
+  for (let i = 0; i < sloiders.length; i++) {
+    sloiders[i].show();
+  }
+
+  fill(0);
+  textAlign(CENTER, TOP);
+  text("INSTRUCTIONS:", width - 112, y_gap*scl/2 + 196);
+
+  textSize(scl*3/4);
+  text("Move Right: 🡆", width - 112, y_gap*scl/2 + 224);
+  text("Move Left: 🡄", width - 112, y_gap*scl/2 + 244);
+  text("Move Down: 🡇", width - 112, y_gap*scl/2 + 264);
+  text("Turn Clockwise: D", width - 112, y_gap*scl/2 + 284);
+  text("Turn Counterclockwise: A", width - 112, y_gap*scl/2 + 304);
+  text("Hold: SPACE", width - 112, y_gap*scl/2 + 324);
 }

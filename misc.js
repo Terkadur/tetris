@@ -97,8 +97,9 @@ function youLose() {
     }
   }
   if (next_game) {
-    newGame();
+    // newGame();
   }
+
 }
   
 function newGame() {
@@ -106,6 +107,7 @@ function newGame() {
   score = 0;
   subscore = 0;
   hold_lock = false;
+  real_path = [];
 
   //sets up the board
   for (let i = 0; i < board_width; i++) {
