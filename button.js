@@ -1,10 +1,10 @@
-function Button (x, y, w, h, txt1, txt2) {
+function Button(x, y, w, h, txt1, txt2) { //class for the buttons
   this.x = x;
   this.y = y;
   this.w = w;
   this.h = h;
-  this.txt1 = txt1;
-  this.txt2 = txt2;
+  this.txt1 = txt1; //text for the "false" state
+  this.txt2 = txt2; //text for the "true" state
   this.state = false;
 
   this.show = function() {

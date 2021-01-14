@@ -38,11 +38,10 @@ function mouseReleased() {
     }
   }
 
-  sloider_held = -1;
+  sloider_held = -1; //signifies the "sloider" is no longer held when the mouse is released
 }
 
 let sloider_held = -1;
-let mouse_start_x, mouse_start_y;
 function mousePressed() {
   for (let i = 0; i < sloiders.length; i++) {
     if (mouseX > sloiders[i].pos - 4 && mouseX < sloiders[i].pos + 4 && mouseY > sloiders[i].y - 16 && mouseY < sloiders[i].y + 16) {
@@ -54,15 +53,15 @@ function mousePressed() {
 
 function mouseDragged() {
   if (sloider_held != -1) {
-    if (mouseX >= sloiders[sloider_held].x && mouseX <= sloiders[sloider_held].x + sloiders[sloider_held].w) {
+    if (mouseX >= sloiders[sloider_held].x && mouseX <= sloiders[sloider_held].x + sloiders[sloider_held].w) { //positions the "sloider" at the mouse's X
       sloiders[sloider_held].pos = mouseX;
-      sloiders[sloider_held].val = round(map(mouseX, sloiders[sloider_held].x, sloiders[sloider_held].x + sloiders[sloider_held].w, 1, 50));
-      _cpt_ = sloiders[sloider_held].val;
-    } else if (mouseX < sloiders[sloider_held].x) {
+      sloiders[sloider_held].val = round(map(mouseX, sloiders[sloider_held].x, sloiders[sloider_held].x + sloiders[sloider_held].w, 1, 50)); //updates the value
+      _cpt_ = sloiders[sloider_held].val; //updates the _cpt_ (calculations per tick ie the speed of the program)
+    } else if (mouseX < sloiders[sloider_held].x) { //lower limit on the "sloider" value
       sloiders[sloider_held].pos = sloiders[sloider_held].x;
       sloiders[sloider_held].val = 1;
       _cpt_ = sloiders[sloider_held].val;
-    } else {
+    } else { //upper limit on the "sloider" value
       sloiders[sloider_held].pos = sloiders[sloider_held].x + sloiders[sloider_held].w;
       sloiders[sloider_held].val = 50;
       _cpt_ = sloiders[sloider_held].val;

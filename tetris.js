@@ -52,7 +52,7 @@ let natural_selection = false;
 
 let best_data = [0, -1];
 let buttons = [];
-let sloiders = [];
+let sloiders = []; //please excuse the use of the name "sloiders" as I had to get around interfering with a p5.js "sliders"
 
 
 
@@ -274,17 +274,19 @@ function draw() {
   }
   
   
-
+  //draw buttons
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].show();
   }
 
+  //draw sloiders
   textAlign(LEFT, TOP);
   text("SPEED: " + _cpt_, width - 112, y_gap*scl/2 + 112);
   for (let i = 0; i < sloiders.length; i++) {
     sloiders[i].show();
   }
 
+  //draw instructions
   fill(0);
   textAlign(CENTER, TOP);
   text("INSTRUCTIONS:", width - 112, y_gap*scl/2 + 196);
